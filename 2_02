@@ -1,0 +1,5 @@
+s = 'bfgshbkis'
+
+result = s[7:2:-2]
+
+print(result)
