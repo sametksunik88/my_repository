@@ -1,0 +1,14 @@
+input_file_name = 'C:/A/input.txt'
+output_file_name = 'output.txt'
+
+with open(input_file_name, 'r', encoding='utf-8') as input_file:
+    original_content = input_file.read()
+
+with open(output_file_name, 'w', encoding='utf-8') as output_file:
+    reversed_content = original_content[::-1]
+    output_file.write(reversed_content)
+
+print("Содержимое исходного файла:")
+print(original_content)
+print("\nСодержимое выходного файла (в обратном порядке):")
+print(reversed_content)
