@@ -1,0 +1,60 @@
+import unittest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+class SearchTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # Указываем путь к ChromeDriver
+        cls.driver = webdriver.Chrome(executable_path='path/to/chromedriver')
+        cls.driver.implicitly_wait(10)
+    
+    def test_search_selenide(self):
+        driver = self.driver
+        # 1. Открыть страницу Yahoo
+        driver.get("https://search.yahoo.com/")
+        
+        # 2. Выполнить поиск слова "selenide"
+        search_box = driver.find_element(By.NAME, "p")
+        search_box.send_keys("selenide")
+        search_box.submit()
+        
+        # 3. Проверить, что первый результат – ссылка на сайт selenide.org.
+        first_result = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="web"]/ol/li[1]/div/div/h3/a'))
+        )
+        self.assertIn("selenide.org", first_result.get_attribute("href"), 
+                      "Первый результат не ссылается на selenide.org.")
+        
+        # 4. Перейти в раздел поиска изображений
+        images_tab = driver.find_element(By.LINK_TEXT, "Images")
+        images_tab.click()
+        
+        # 5. Проверить, что первое изображение связано с сайтом selenide.org
+        first_image = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="imgdiv"]/div[1]/img'))
+        )
+        first_image_src = first_image.get_attribute("src")
+        self.assertIn("selenide", first_image_src, 
+                      "Первое изображение не связано с сайтом selenide.org.")
+        
+        # 6. Вернуться в раздел поиска Все
+        driver.back()
+        
+        # 7. Проверить, что первый результат такой же, как и на шаге 3.
+        first_result_after_back = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="web"]/ol/li[1]/div/div/h3/a'))
+        )
+        self.assertIn("selenide.org", first_result_after_back.get_attribute("href"), 
+                      "Первый результат после возврата не такой же, как предыдущий.")
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+
+
+if __name__ == "__main__":
+    unittest.main()
